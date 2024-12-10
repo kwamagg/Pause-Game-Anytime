@@ -1,3 +1,4 @@
+; You need to rename the file name to "PauseGameAnytime"
 Scriptname PauseGameAnytime extends Quest
 
 Bool isPaused = False
