@@ -4,18 +4,18 @@ Scriptname PauseGameAnytime extends Quest
 Bool isPaused = False
 String iniPath = "Data/PauseGameAnytime_Settings.ini"
 Int PauseHotkey = 12
+Float CameraSpeed = 1.0
 Int CameraState = 0
-String CameraSpeed = "1"
 
 Event OnInit()
 	PauseHotkey = PapyrusIniManipulator.PullIntFromIni(iniPath, "Hotkeys", "PauseHotkey", PauseHotkey)
-	CameraSpeed = PapyrusIniManipulator.PullStringFromIni(iniPath, "Settings", "CameraSpeed", CameraSpeed)
+	CameraSpeed = PapyrusIniManipulator.PullFloatFromIni(iniPath, "Settings", "CameraSpeed", CameraSpeed)
 	RegisterForKey(PauseHotkey)
 EndEvent
 
 Event OnPlayerLoadGame()
 	PauseHotkey = PapyrusIniManipulator.PullIntFromIni(iniPath, "Hotkeys", "PauseHotkey", PauseHotkey)
-	CameraSpeed = PapyrusIniManipulator.PullStringFromIni(iniPath, "Settings", "CameraSpeed", CameraSpeed)
+	CameraSpeed = PapyrusIniManipulator.PullFloatFromIni(iniPath, "Settings", "CameraSpeed", CameraSpeed)
 	RegisterForKey(PauseHotkey)
 EndEvent
 
