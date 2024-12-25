@@ -1,20 +1,56 @@
-Scriptname PauseGameAnytime extends Quest
+Scriptname PauseGameAnytime extends ReferenceAlias
 
-String iniPath = "Data/PauseGameAnytime_Settings.ini"
-Int PauseHotkey = 12
+Actor Property PGA_Player Auto
+GlobalVariable Property PGA_Hotkey Auto
+GlobalVariable Property PGA_CameraSpeed Auto
+GlobalVariable Property PGA_FreeCamEnabled Auto
+GlobalVariable Property PGA_PauseOnLoadEnabled Auto
+GlobalVariable Property PGA_Waiting Auto
+
+Bool isPaused = False
+Bool pausedInFreeCam = False
+Int CameraState = 0
 
 Event OnInit()
-	PauseHotkey = PapyrusIniManipulator.PullIntFromIni(iniPath, "Hotkeys", "PauseHotkey", PauseHotkey)
-	RegisterForKey(PauseHotkey)
+	UnregisterForAllKeys()
+	RegisterForKey(PGA_Hotkey.GetValueInt())
 EndEvent
 
 Event OnPlayerLoadGame()
-	PauseHotkey = PapyrusIniManipulator.PullIntFromIni(iniPath, "Hotkeys", "PauseHotkey", PauseHotkey)
-	RegisterForKey(PauseHotkey)
+	If PGA_PauseOnLoadEnabled.GetValue() == 1.0
+		ConsoleUtil.ExecuteCommand("sgtm 0")
+		Utility.Wait(PGA_Waiting.GetValue())
+		ConsoleUtil.ExecuteCommand("sgtm 1")
+	EndIf
+	UnregisterForAllKeys()
+	RegisterForKey(PGA_Hotkey.GetValueInt())
 EndEvent
 
 Event OnKeyDown(Int keyCode)
-	If keyCode == PauseHotkey
-		ConsoleUtil.ExecuteCommand("tfc 1")
+	CameraState = Game.GetCameraState()
+	If keyCode == PGA_Hotkey.GetValueInt()
+		if !isPaused
+			If CameraState == 0 || (PGA_FreeCamEnabled.GetValue() == 0.0)
+				ConsoleUtil.ExecuteCommand("sgtm 0")
+				ConsoleUtil.ExecuteCommand("disableplayercontrols 1 1 1 1")
+				pausedInFreeCam = False
+				isPaused = True		
+			ElseIf PGA_FreeCamEnabled.GetValue() == 1.0
+				ConsoleUtil.ExecuteCommand("tfc 1")
+				ConsoleUtil.ExecuteCommand("sucsm " + PGA_CameraSpeed.GetValue())
+				pausedInFreeCam = True
+				isPaused = True
+			EndIf
+		Else 
+			If pausedInFreeCam
+				ConsoleUtil.ExecuteCommand("tfc 1")
+				pausedInFreeCam = False
+				isPaused = False
+			Else
+				ConsoleUtil.ExecuteCommand("sgtm 1")
+				ConsoleUtil.ExecuteCommand("enableplayercontrols")
+				isPaused = False
+			EndIf
+		EndIf
 	EndIf
 EndEvent
